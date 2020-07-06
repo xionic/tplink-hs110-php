@@ -36,7 +36,7 @@ class TPLinkHS110Device {
         return $this->sendCommand(TPLinkHS110Command::SWITCH_OFF);
     }
 
-    private function sendCommand($command) {
+    public function sendCommand($command) {
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if ($socket === false) {
 //            echo "socket_create() failed: reason: " . socket_strerror(socket_last_error()) . "\n";
@@ -54,18 +54,19 @@ class TPLinkHS110Device {
 
         $in = self::tp_encrypt($command);
         $out = '';
-
-//        echo "Sending HTTP HEAD request...";
+var_dump($this);
+        echo "Sending HTTP HEAD request...";
+        socket_set_option($socket,SOL_SOCKET, SO_RCVTIMEO, array("sec"=>1, "usec"=>0));
         socket_write($socket, $in, strlen($in));
-//        echo "OK.\n";
+        echo "OK.\n";
         $response = "";
-//        echo "Reading response:\n\n";
+        echo "Reading response:\n\n";
         while ($out = socket_read($socket, 2048)) {
             $response .= $out;
             
         }
-
-//        echo "Closing socket...";
+       // echo "response: " . $response . PHP_EOL;
+        echo "Closing socket...\n";
         socket_close($socket);
         return self::tp_decrypt($response);
 //        echo "OK.\n\n";
@@ -80,6 +81,7 @@ class TPLinkHS110Device {
      */
     private static function tp_decrypt($cypher_text, $first_key = 0xAB) {
         $header = substr($cypher_text, 0, 4);
+       // echo "--- " . base64_encode($cypher_text); die;
         $header_length = unpack('N*', $header)[1];
         $cypher_text = substr($cypher_text, 4);
         $buf = unpack('c*', $cypher_text);
