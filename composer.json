@@ -1,5 +1,5 @@
 {
-  "name": "slavino/tplinkhs110",
+  "name": "xionic/tplinkhs110",
   "description": "A PHP library to control and receive information from a TP-Link HS-110 smartplug.",
   "license": "MIT",
   "type": "library",
